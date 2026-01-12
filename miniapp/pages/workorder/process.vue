@@ -25,6 +25,25 @@
         </view>
       </view>
 
+      <view class="form-item">
+        <text class="label">消耗备件 (可选)</text>
+        <view class="spare-parts-section">
+          <view v-for="(part, idx) in selectedParts" :key="idx" class="part-item">
+            <picker :range="inventoryItems" range-key="itemName" @change="e => onPartChange(e, idx)" class="part-picker">
+              <view class="picker-display">
+                <text class="part-name">{{ part.itemName || '选择备件' }}</text>
+                <text class="picker-arrow">▼</text>
+              </view>
+            </picker>
+            <input type="number" v-model="part.quantity" placeholder="数量" class="quantity-input" />
+            <view class="remove-part-btn" @click="removePart(idx)">删除</view>
+          </view>
+          <view class="add-part-btn" @click="addPart">
+            <text class="add-icon">+</text> 添加备件
+          </view>
+        </view>
+      </view>
+
     </view>
 
     <view class="submit-section">
@@ -37,6 +56,7 @@
 
 <script>
 import { submitOrder, uploadFile } from '../../api/workorder.js'
+import { getItemList, addConsumption } from '../../api/inventory.js'
 
 export default {
   data() {
@@ -46,13 +66,35 @@ export default {
         processDescription: ''
       },
       imageList: [],
+      inventoryItems: [],
+      selectedParts: [],
       submitting: false
     }
   },
   onLoad(options) {
     this.orderId = options.id
+    this.loadInventoryItems()
   },
   methods: {
+    async loadInventoryItems() {
+      try {
+        const res = await getItemList()
+        this.inventoryItems = res.data.filter(item => item.status === 1)
+      } catch (err) {
+        console.error('加载备件列表失败', err)
+      }
+    },
+    addPart() {
+      this.selectedParts.push({ itemId: null, itemName: '', quantity: 1 })
+    },
+    removePart(idx) {
+      this.selectedParts.splice(idx, 1)
+    },
+    onPartChange(e, idx) {
+      const item = this.inventoryItems[e.detail.value]
+      this.selectedParts[idx].itemId = item.id
+      this.selectedParts[idx].itemName = item.itemName
+    },
     chooseImage() {
       uni.chooseImage({
         count: 9 - this.imageList.length,
@@ -96,6 +138,20 @@ export default {
           processDescription: this.form.processDescription,
           processImages: JSON.stringify(processImages)
         })
+
+        for (let part of this.selectedParts) {
+          if (part.itemId && part.quantity > 0) {
+            try {
+              await addConsumption({
+                orderId: this.orderId,
+                itemId: part.itemId,
+                quantity: parseInt(part.quantity)
+              })
+            } catch (err) {
+              console.error('关联备件失败:', err)
+            }
+          }
+        }
 
         uni.showToast({ title: '提交成功', icon: 'success' })
         setTimeout(() => {
@@ -219,5 +275,79 @@ export default {
   height: 88rpx;
   line-height: 88rpx;
   font-size: 32rpx;
+}
+
+.spare-parts-section {
+  background: #f9f9f9;
+  border-radius: 8rpx;
+  padding: 16rpx;
+}
+
+.part-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 16rpx;
+  margin-bottom: 16rpx;
+  border-radius: 8rpx;
+}
+
+.part-picker {
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.picker-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 16rpx;
+  background: #f5f5f5;
+  border-radius: 6rpx;
+}
+
+.part-name {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.picker-arrow {
+  font-size: 20rpx;
+  color: #999;
+}
+
+.quantity-input {
+  width: 120rpx;
+  height: 60rpx;
+  background: #f5f5f5;
+  border-radius: 6rpx;
+  text-align: center;
+  font-size: 28rpx;
+  margin-right: 16rpx;
+}
+
+.remove-part-btn {
+  padding: 8rpx 16rpx;
+  background: #f56c6c;
+  color: #fff;
+  font-size: 24rpx;
+  border-radius: 6rpx;
+}
+
+.add-part-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  background: #fff;
+  border: 2rpx dashed #ddd;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #409eff;
+}
+
+.add-part-btn .add-icon {
+  font-size: 32rpx;
+  margin-right: 8rpx;
 }
 </style>

@@ -45,6 +45,13 @@ export function submitOrder(id, data) {
   })
 }
 
+export function getOrderConsumptions(orderId) {
+  return request({
+    url: `/inventory/consumption/order/${orderId}`,
+    method: 'GET'
+  })
+}
+
 export function uploadFile(filePath) {
   return new Promise((resolve, reject) => {
     const token = uni.getStorageSync('token')

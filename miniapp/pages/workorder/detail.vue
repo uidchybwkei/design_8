@@ -62,6 +62,19 @@
         </view>
       </view>
 
+      <view class="info-card" v-if="consumptions.length > 0">
+        <view class="card-title">备件消耗</view>
+        <view class="consumption-list">
+          <view class="consumption-item" v-for="item in consumptions" :key="item.id">
+            <view class="consumption-name">{{ item.itemName }}</view>
+            <view class="consumption-detail">
+              <text class="spec">{{ item.itemCode }}</text>
+              <text class="qty">× {{ item.quantity }}{{ item.unit || '' }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
       <view class="action-section">
         <button v-if="order.status === 1 && isAssignee" type="primary" @click="handleAccept" :loading="actionLoading">
           接单
@@ -80,7 +93,7 @@
 </template>
 
 <script>
-import { getOrderById, acceptOrder } from '../../api/workorder.js'
+import { getOrderById, acceptOrder, getOrderConsumptions } from '../../api/workorder.js'
 
 export default {
   data() {
@@ -89,7 +102,8 @@ export default {
       order: null,
       loading: true,
       actionLoading: false,
-      currentUserId: null
+      currentUserId: null,
+      consumptions: []
     }
   },
   computed: {
@@ -122,10 +136,10 @@ export default {
       try {
         const res = await getOrderById(this.orderId)
         this.order = res.data
-        console.log('工单详情:', this.order)
-        console.log('assigneeId:', this.order.assigneeId, 'type:', typeof this.order.assigneeId)
-        console.log('currentUserId:', this.currentUserId, 'type:', typeof this.currentUserId)
-        console.log('isAssignee:', this.isAssignee)
+        try {
+          const consumRes = await getOrderConsumptions(this.orderId)
+          this.consumptions = consumRes.data || []
+        } catch { this.consumptions = [] }
       } catch (err) {
         uni.showToast({ title: err.message || '加载失败', icon: 'none' })
       } finally {
@@ -286,5 +300,46 @@ export default {
 
 .action-section button {
   margin-bottom: 20rpx;
+}
+
+.consumption-list {
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 16rpx;
+}
+
+.consumption-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1px solid #eee;
+}
+
+.consumption-item:last-child {
+  border-bottom: none;
+}
+
+.consumption-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.consumption-detail {
+  display: flex;
+  align-items: center;
+}
+
+.consumption-detail .spec {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 16rpx;
+}
+
+.consumption-detail .qty {
+  font-size: 28rpx;
+  color: #e6a23c;
+  font-weight: bold;
 }
 </style>
