@@ -29,11 +29,14 @@ public class WorkOrderService {
     @Autowired
     private UserMapper userMapper;
 
-    public IPage<WorkOrder> pageList(Integer pageNum, Integer pageSize, Integer status,
+    public IPage<WorkOrder> pageList(Integer pageNum, Integer pageSize, Integer status, Integer orderType,
                                      Long facilityId, Long assigneeId, Long reporterId, String keyword) {
         Page<WorkOrder> page = new Page<>(pageNum, pageSize);
-        IPage<WorkOrder> result = workOrderMapper.selectPageByCondition(page, status, facilityId, assigneeId, reporterId, keyword);
-        result.getRecords().forEach(o -> o.setStatusName(WorkOrder.getStatusName(o.getStatus())));
+        IPage<WorkOrder> result = workOrderMapper.selectPageByCondition(page, status, orderType, facilityId, assigneeId, reporterId, keyword);
+        result.getRecords().forEach(o -> {
+            o.setStatusName(WorkOrder.getStatusName(o.getStatus()));
+            o.setOrderTypeName(WorkOrder.getOrderTypeName(o.getOrderType()));
+        });
         return result;
     }
 
@@ -91,6 +94,55 @@ public class WorkOrderService {
 
         saveLog(order.getId(), order.getOrderNo(), WorkOrderLog.ACTION_CREATE,
                 null, WorkOrder.STATUS_PENDING, reporterId, reporterName, "上报故障");
+
+        return order;
+    }
+
+    @Transactional
+    public WorkOrder createMaintenanceOrder(Long facilityId, String description, Long planId) {
+        System.out.println("===== 开始创建保养工单 =====");
+        System.out.println("facilityId: " + facilityId);
+        System.out.println("description: " + description);
+        
+        Facility facility = facilityMapper.selectById(facilityId);
+        if (facility == null) {
+            throw new BusinessException("设施不存在");
+        }
+        if (facility.getStatus() != 1) {
+            throw new BusinessException("该设施已停用，无法创建保养工单");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        String orderNo = generateOrderNo();
+        System.out.println("生成工单号: " + orderNo);
+        
+        WorkOrder order = new WorkOrder();
+        order.setOrderNo(orderNo);
+        order.setOrderType(2);
+        order.setFacilityId(facilityId);
+        order.setFacilityCode(facility.getFacilityCode());
+        order.setFacilityName(facility.getFacilityName());
+        order.setStatus(WorkOrder.STATUS_PENDING);
+        order.setFaultDescription(description != null ? description : "定期保养");
+        order.setFaultImages("[]");
+        order.setReporterId(0L);
+        order.setReporterName("系统");
+        order.setReportTime(now);
+        order.setCreateTime(now);
+        order.setUpdateTime(now);
+
+        System.out.println("准备插入工单...");
+        try {
+            workOrderMapper.insert(order);
+            System.out.println("工单插入成功，ID: " + order.getId());
+        } catch (Exception e) {
+            System.err.println("工单插入失败: " + e.getMessage());
+            e.printStackTrace();
+            throw new BusinessException("创建保养工单失败: " + e.getMessage());
+        }
+
+        saveLog(order.getId(), order.getOrderNo(), WorkOrderLog.ACTION_CREATE,
+                null, WorkOrder.STATUS_PENDING, 0L, "系统", "保养计划自动生成");
 
         return order;
     }

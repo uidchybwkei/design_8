@@ -16,6 +16,7 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
     @Select("<script>" +
             "SELECT * FROM work_order WHERE deleted = 0 " +
             "<if test='status != null'> AND status = #{status} </if>" +
+            "<if test='orderType != null'> AND order_type = #{orderType} </if>" +
             "<if test='facilityId != null'> AND facility_id = #{facilityId} </if>" +
             "<if test='assigneeId != null'> AND assignee_id = #{assigneeId} </if>" +
             "<if test='reporterId != null'> AND reporter_id = #{reporterId} </if>" +
@@ -24,6 +25,7 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
             "</script>")
     IPage<WorkOrder> selectPageByCondition(Page<WorkOrder> page,
                                            @Param("status") Integer status,
+                                           @Param("orderType") Integer orderType,
                                            @Param("facilityId") Long facilityId,
                                            @Param("assigneeId") Long assigneeId,
                                            @Param("reporterId") Long reporterId,

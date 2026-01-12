@@ -44,6 +44,22 @@ public class WorkOrder {
     @TableField(exist = false)
     private String statusName;
 
+    @TableField(exist = false)
+    private String orderTypeName;
+
+    // 工单类型常量
+    public static final int TYPE_REPAIR = 1;      // 维修
+    public static final int TYPE_MAINTENANCE = 2; // 保养
+
+    public static String getOrderTypeName(Integer orderType) {
+        if (orderType == null) return "";
+        switch (orderType) {
+            case TYPE_REPAIR: return "维修";
+            case TYPE_MAINTENANCE: return "保养";
+            default: return "未知";
+        }
+    }
+
     // 状态常量
     public static final int STATUS_PENDING = 0;    // 待派发
     public static final int STATUS_ASSIGNED = 1;   // 已派发
@@ -151,4 +167,9 @@ public class WorkOrder {
         return statusName != null ? statusName : getStatusName(this.status);
     }
     public void setStatusName(String statusName) { this.statusName = statusName; }
+
+    public String getOrderTypeName() {
+        return orderTypeName != null ? orderTypeName : getOrderTypeName(this.orderType);
+    }
+    public void setOrderTypeName(String orderTypeName) { this.orderTypeName = orderTypeName; }
 }

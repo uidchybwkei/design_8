@@ -27,6 +27,13 @@ public class FacilityService {
     @Autowired
     private FacilityCategoryMapper categoryMapper;
 
+    public List<Facility> list() {
+        LambdaQueryWrapper<Facility> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Facility::getDeleted, 0);
+        wrapper.orderByDesc(Facility::getCreateTime);
+        return facilityMapper.selectList(wrapper);
+    }
+
     public IPage<Facility> pageList(Integer pageNum, Integer pageSize, Long categoryId, Integer status, String keyword) {
         Page<Facility> page = new Page<>(pageNum, pageSize);
         return facilityMapper.selectPageWithCategory(page, categoryId, status, keyword);

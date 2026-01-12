@@ -6,6 +6,12 @@
       </template>
 
       <el-form :inline="true" :model="queryParams" class="search-form">
+        <el-form-item label="类型">
+          <el-select v-model="queryParams.orderType" placeholder="全部" clearable style="width: 100px;">
+            <el-option label="维修" :value="1" />
+            <el-option label="保养" :value="2" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryParams.status" placeholder="全部" clearable style="width: 120px;">
             <el-option label="待派发" :value="0" />
@@ -27,6 +33,11 @@
 
       <el-table :data="tableData" v-loading="loading" border>
         <el-table-column prop="orderNo" label="工单编号" width="180" />
+        <el-table-column prop="orderTypeName" label="类型" width="70">
+          <template #default="{ row }">
+            <el-tag :type="row.orderType === 1 ? 'danger' : 'warning'" size="small">{{ row.orderTypeName }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="facilityName" label="设施名称" min-width="120" />
         <el-table-column prop="faultDescription" label="故障描述" min-width="150" show-overflow-tooltip />
         <el-table-column prop="reporterName" label="上报人" width="90" />
@@ -149,7 +160,7 @@ export default {
     const orderLogs = ref([])
     const assignableUsers = ref([])
 
-    const queryParams = reactive({ pageNum: 1, pageSize: 10, status: null, keyword: '' })
+    const queryParams = reactive({ pageNum: 1, pageSize: 10, status: null, orderType: null, keyword: '' })
     const assignForm = reactive({ orderId: null, assigneeId: null })
     const verifyForm = reactive({ orderId: null, remark: '' })
 
@@ -166,6 +177,7 @@ export default {
 
     const resetQuery = () => {
       queryParams.status = null
+      queryParams.orderType = null
       queryParams.keyword = ''
       queryParams.pageNum = 1
       loadData()

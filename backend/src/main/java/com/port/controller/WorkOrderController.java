@@ -29,11 +29,12 @@ public class WorkOrderController {
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) Integer orderType,
             @RequestParam(required = false) Long facilityId,
             @RequestParam(required = false) Long assigneeId,
             @RequestParam(required = false) Long reporterId,
             @RequestParam(required = false) String keyword) {
-        IPage<WorkOrder> page = workOrderService.pageList(pageNum, pageSize, status, facilityId, assigneeId, reporterId, keyword);
+        IPage<WorkOrder> page = workOrderService.pageList(pageNum, pageSize, status, orderType, facilityId, assigneeId, reporterId, keyword);
         PageResult<WorkOrder> result = new PageResult<>(page.getTotal(), page.getRecords());
         return Result.success(result);
     }

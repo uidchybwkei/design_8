@@ -12,6 +12,12 @@
       <view class="info-card">
         <view class="card-title">工单信息</view>
         <view class="info-row">
+          <text class="label">工单类型</text>
+          <text class="value order-type-tag" :class="order.orderType === 1 ? 'type-repair' : 'type-maintenance'">
+            {{ order.orderType === 1 ? '维修' : '保养' }}
+          </text>
+        </view>
+        <view class="info-row">
           <text class="label">工单编号</text>
           <text class="value">{{ order.orderNo }}</text>
         </view>
@@ -20,7 +26,7 @@
           <text class="value">{{ order.facilityName }}</text>
         </view>
         <view class="info-row">
-          <text class="label">故障描述</text>
+          <text class="label">{{ order.orderType === 1 ? '故障描述' : '保养内容' }}</text>
           <text class="value">{{ order.faultDescription }}</text>
         </view>
         <view class="info-row">
@@ -198,6 +204,22 @@ export default {
 .status-text {
   font-size: 36rpx;
   font-weight: bold;
+}
+
+.order-type-tag {
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+}
+
+.type-repair {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
+.type-maintenance {
+  background: #fdf6ec;
+  color: #e6a23c;
 }
 
 .info-card {

@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getFacilityList() {
+  return request({
+    url: '/facility/list',
+    method: 'get'
+  })
+}
+
 export function getFacilityPage(params) {
   return request({
     url: '/facility/page',

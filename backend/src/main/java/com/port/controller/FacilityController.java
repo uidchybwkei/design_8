@@ -19,6 +19,12 @@ public class FacilityController {
     @Autowired
     private FacilityService facilityService;
 
+    @GetMapping("/list")
+    public Result<List<Facility>> list() {
+        List<Facility> list = facilityService.list();
+        return Result.success(list);
+    }
+
     @GetMapping("/page")
     public Result<PageResult<Facility>> page(
             @RequestParam(defaultValue = "1") Integer pageNum,

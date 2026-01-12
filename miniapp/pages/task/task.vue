@@ -30,7 +30,12 @@
           @click="goToDetail(order)"
         >
           <view class="order-header">
-            <text class="order-no">{{ order.orderNo }}</text>
+            <view class="order-info">
+              <text class="order-type" :class="order.orderType === 1 ? 'type-repair' : 'type-maintenance'">
+                {{ order.orderType === 1 ? '维修' : '保养' }}
+              </text>
+              <text class="order-no">{{ order.orderNo }}</text>
+            </view>
             <text class="status" :class="'status-' + order.status">{{ order.statusName }}</text>
           </view>
           <view class="order-body">
@@ -188,6 +193,28 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16rpx;
+}
+
+.order-info {
+  display: flex;
+  align-items: center;
+}
+
+.order-type {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  margin-right: 12rpx;
+}
+
+.type-repair {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
+.type-maintenance {
+  background: #fdf6ec;
+  color: #e6a23c;
 }
 
 .order-no {
