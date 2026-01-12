@@ -41,12 +41,6 @@ const routes = [
         name: 'Inventory',
         component: () => import('@/views/Inventory.vue'),
         meta: { title: '库存管理' }
-      },
-      {
-        path: 'stats',
-        name: 'Stats',
-        component: () => import('@/views/Stats.vue'),
-        meta: { title: '统计分析' }
       }
     ]
   }

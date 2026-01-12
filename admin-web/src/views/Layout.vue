@@ -31,10 +31,6 @@
           <el-icon><Box /></el-icon>
           <span>库存管理</span>
         </el-menu-item>
-        <el-menu-item index="/stats">
-          <el-icon><DataAnalysis /></el-icon>
-          <span>统计分析</span>
-        </el-menu-item>
       </el-menu>
     </el-aside>
 

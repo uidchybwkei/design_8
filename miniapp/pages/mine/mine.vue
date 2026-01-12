@@ -5,6 +5,28 @@
       <text class="phone">{{ userInfo.phone || '未绑定' }}</text>
     </view>
 
+    <view class="stats-section" v-if="stats">
+      <view class="stats-title">我的工作统计</view>
+      <view class="stats-cards">
+        <view class="stat-card">
+          <text class="stat-value">{{ stats.totalCount || 0 }}</text>
+          <text class="stat-label">总工单</text>
+        </view>
+        <view class="stat-card success">
+          <text class="stat-value">{{ stats.completedCount || 0 }}</text>
+          <text class="stat-label">已完成</text>
+        </view>
+        <view class="stat-card warning">
+          <text class="stat-value">{{ stats.pendingCount || 0 }}</text>
+          <text class="stat-label">待处理</text>
+        </view>
+      </view>
+      <view class="avg-duration">
+        <text class="duration-label">平均处理耗时：</text>
+        <text class="duration-value">{{ stats.avgDurationDisplay || '-' }}</text>
+      </view>
+    </view>
+
     <view class="logout-section">
       <button class="logout-btn" @click="handleLogout">退出登录</button>
     </view>
@@ -13,11 +35,13 @@
 
 <script>
 import { getUserInfo } from '../../api/auth.js'
+import { getMyStats } from '../../api/stats.js'
 
 export default {
   data() {
     return {
-      userInfo: null
+      userInfo: null,
+      stats: null
     }
   },
   onLoad() {
@@ -29,6 +53,7 @@ export default {
       return
     }
     this.loadUserInfo()
+    this.loadStats()
   },
   methods: {
     async loadUserInfo() {
@@ -37,6 +62,14 @@ export default {
         this.userInfo = res.data
       } catch (error) {
         console.error('获取用户信息失败:', error)
+      }
+    },
+    async loadStats() {
+      try {
+        const res = await getMyStats()
+        this.stats = res.data
+      } catch (error) {
+        console.error('获取统计数据失败:', error)
       }
     },
     handleLogout() {
@@ -96,5 +129,72 @@ export default {
   color: #f56c6c;
   border: 1px solid #f56c6c;
   font-size: 30rpx;
+}
+
+.stats-section {
+  background: #f8f9fa;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 40rpx;
+}
+
+.stats-title {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.stats-cards {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.stat-card {
+  flex: 1;
+  text-align: center;
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx 10rpx;
+  margin: 0 8rpx;
+}
+
+.stat-card:first-child { margin-left: 0; }
+.stat-card:last-child { margin-right: 0; }
+
+.stat-value {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #409eff;
+}
+
+.stat-card.success .stat-value { color: #67c23a; }
+.stat-card.warning .stat-value { color: #e6a23c; }
+
+.stat-label {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.avg-duration {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  justify-content: space-between;
+}
+
+.duration-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.duration-value {
+  font-size: 26rpx;
+  color: #409eff;
+  font-weight: bold;
 }
 </style>
