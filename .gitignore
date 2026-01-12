@@ -1,0 +1,35 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+
+# Node
+node_modules/
+dist/
+.DS_Store
+*.log
+npm-debug.log*
+
+# uni-app
+miniapp/unpackage/
+miniapp/dist/
+
+# Vue
+admin-web/dist/
+admin-web/.vite/
+
+# Database
+*.sql~
+
+# Editor
+.vscode/
+*.swp
+*.swo
+*~

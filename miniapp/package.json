@@ -1,0 +1,9 @@
+{
+  "name": "port-maintenance-miniapp",
+  "version": "1.0.0",
+  "description": "港航设施维修保养系统-微信小程序",
+  "main": "main.js",
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {}
+}

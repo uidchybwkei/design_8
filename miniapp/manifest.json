@@ -1,0 +1,22 @@
+{
+    "name" : "port-maintenance-miniapp",
+    "appid" : "__UNI__MOCK123",
+    "description" : "港航设施维修保养系统",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "vueVersion" : "3",
+    "mp-weixin" : {
+        "appid" : "wxc4540ce17570cf1c",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : true,
+            "postcss" : true,
+            "minified" : true
+        },
+        "usingComponents" : true
+    },
+    "uniStatistics" : {
+        "enable" : false
+    }
+}
