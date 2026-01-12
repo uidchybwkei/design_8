@@ -29,6 +29,24 @@
       "style": {
         "navigationBarTitleText": "设施详情"
       }
+    },
+    {
+      "path": "pages/workorder/report",
+      "style": {
+        "navigationBarTitleText": "故障上报"
+      }
+    },
+    {
+      "path": "pages/workorder/detail",
+      "style": {
+        "navigationBarTitleText": "工单详情"
+      }
+    },
+    {
+      "path": "pages/workorder/process",
+      "style": {
+        "navigationBarTitleText": "处理工单"
+      }
     }
   ],
   "globalStyle": {

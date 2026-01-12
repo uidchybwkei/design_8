@@ -39,7 +39,10 @@ export default {
         const res = await wxLogin(mockCode)
         
         uni.setStorageSync('token', res.data.token)
+        uni.setStorageSync('userId', res.data.userId)
         uni.setStorageSync('userInfo', res.data)
+        
+        console.log('登录成功，userId:', res.data.userId)
         
         uni.showToast({
           title: '登录成功',

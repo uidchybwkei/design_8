@@ -28,3 +28,8 @@ mybatis-plus:
 jwt:
   secret: portMaintenanceSystemSecretKey2024ForJWTTokenGeneration
   expiration: 604800000
+
+file:
+  upload:
+    path: ./uploads
+    url-prefix: /uploads

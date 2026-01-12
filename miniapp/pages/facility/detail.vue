@@ -55,13 +55,31 @@
       <view class="action-section">
         <view class="action-title">操作入口</view>
         <view class="action-list">
-          <view class="action-item" @click="viewHistory">
-            <text>维修/保养记录</text>
-            <text class="action-tip">里程碑3实现</text>
-          </view>
-          <view class="action-item" @click="reportFault">
+          <view class="action-item" @click="reportFault" v-if="facility.status === 1">
             <text>上报故障</text>
-            <text class="action-tip">里程碑3实现</text>
+            <text class="action-arrow">></text>
+          </view>
+          <view class="action-item" @click="viewHistory">
+            <text>维修记录 ({{ historyCount }})</text>
+            <text class="action-arrow">></text>
+          </view>
+        </view>
+      </view>
+
+      <view class="history-section" v-if="showHistory && historyList.length > 0">
+        <view class="section-title">维修记录</view>
+        <view class="history-list">
+          <view v-for="item in historyList" :key="item.id" class="history-item">
+            <view class="history-header">
+              <text class="history-no">{{ item.orderNo }}</text>
+              <text class="history-status">{{ item.statusName }}</text>
+            </view>
+            <view class="history-body">
+              <text>{{ item.faultDescription }}</text>
+            </view>
+            <view class="history-footer">
+              <text>{{ item.createTime }}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -78,7 +96,10 @@ export default {
       loading: true,
       error: false,
       errorMsg: '',
-      facility: {}
+      facility: {},
+      historyList: [],
+      historyCount: 0,
+      showHistory: false
     }
   },
   onLoad(options) {
@@ -97,6 +118,7 @@ export default {
       try {
         const res = await getFacilityByCode(code)
         this.facility = res.data
+        this.loadHistory()
       } catch (err) {
         this.error = true
         this.errorMsg = err.message || '获取设施信息失败'
@@ -104,14 +126,36 @@ export default {
         this.loading = false
       }
     },
+    async loadHistory() {
+      try {
+        const token = uni.getStorageSync('token')
+        const res = await uni.request({
+          url: `http://localhost:8080/workorder/facility/${this.facility.id}/history`,
+          method: 'GET',
+          header: { 'Authorization': 'Bearer ' + token }
+        })
+        if (res.data.code === 200) {
+          this.historyList = res.data.data || []
+          this.historyCount = this.historyList.length
+        }
+      } catch (err) {
+        console.error('加载历史失败', err)
+      }
+    },
     goBack() {
       uni.navigateBack()
     },
     viewHistory() {
-      uni.showToast({ title: '里程碑3实现', icon: 'none' })
+      this.showHistory = !this.showHistory
     },
     reportFault() {
-      uni.showToast({ title: '里程碑3实现', icon: 'none' })
+      if (this.facility.status !== 1) {
+        uni.showToast({ title: '该设施已停用', icon: 'none' })
+        return
+      }
+      uni.navigateTo({
+        url: `/pages/workorder/report?facilityCode=${this.facility.facilityCode}`
+      })
     }
   }
 }
@@ -236,8 +280,63 @@ export default {
   color: #333;
 }
 
-.action-tip {
+.action-arrow {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.history-section {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-top: 20rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.history-item {
+  background: #f9f9f9;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.history-item:last-child {
+  margin-bottom: 0;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.history-no {
   font-size: 24rpx;
+  color: #999;
+}
+
+.history-status {
+  font-size: 24rpx;
+  color: #67c23a;
+}
+
+.history-body {
+  margin-bottom: 12rpx;
+}
+
+.history-body text {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.history-footer text {
+  font-size: 22rpx;
   color: #999;
 }
 </style>
